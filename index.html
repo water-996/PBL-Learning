@@ -259,7 +259,7 @@ body{font-family:-apple-system,'PingFang SC','Noto Sans SC',sans-serif;backgroun
       <div class="logo-sub">PBL 项目式学习助手</div>
     </div>
   </div>
-  <div class="hdr-badge">由 Claude AI 驱动</div>
+  <div class="hdr-badge">由 Kimi AI 驱动</div>
 </header>
 
 <div class="layout">
@@ -320,12 +320,12 @@ body{font-family:-apple-system,'PingFang SC','Noto Sans SC',sans-serif;backgroun
 
   <!-- API key -->
   <div>
-    <div class="slabel">Claude API Key</div>
+    <div class="slabel">Kimi API Key</div>
     <div class="api-wrap">
-      <input type="password" class="api-in" id="apiKey" placeholder="sk-ant-…"/>
+      <input type="password" class="api-in" id="apiKey" placeholder="sk-…"/>
       <button class="eye" onclick="togEye()">👁</button>
     </div>
-    <p class="api-hint">获取：<a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>（免费额度可用）<br>Key 仅存于本地，不会上传。</p>
+    <p class="api-hint">获取：<a href="https://platform.moonshot.cn" target="_blank">platform.moonshot.cn</a>（注册有免费额度）<br>Key 仅存于本地，不会上传。</p>
   </div>
 
 </aside>
@@ -511,15 +511,15 @@ async function run(){
 - 直接输出 JSON，无任何前缀说明`;
 
   try{
-    var r=await fetch('https://api.anthropic.com/v1/messages',{
+    var r=await fetch('https://api.moonshot.cn/v1/chat/completions',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:6000,messages:[{role:'user',content:prompt}]})
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model:'moonshot-v1-32k',max_tokens:6000,messages:[{role:'user',content:prompt}]})
     });
     clearInterval(iv);
     if(!r.ok){var e=await r.json().catch(function(){return{};});throw new Error((e.error&&e.error.message)||'API错误 '+r.status);}
     var d=await r.json();
-    var raw=d.content[0].text.trim().replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'');
+    var raw=d.choices[0].message.content.trim().replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'');
     var res=JSON.parse(raw);
     S.res=res; S.prob=prob; S.gradeStr=S.level+'（'+S.grade+'年级，约'+S.age+'岁）';
     ld.classList.remove('vis');
