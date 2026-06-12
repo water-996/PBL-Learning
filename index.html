@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>博学先生 · PBL 学习助手</title>
+<style>
+:root {
+  --bg: #F5F4EF;
+  --surface: #FFFFFF;
+  --surface2: #EFEDE6;
+  --border: #DDD9CF;
+  --text: #1C1B18;
+  --text2: #686660;
+  --text3: #9C9A93;
+  --accent: #2A5F47;
+  --accent-l: #E5F2EC;
+  --accent-m: #4FAF80;
+  --warn: #A83B18;
+  --warn-l: #FCF0EB;
+  --purple: #3D3480;
+  --purple-l: #ECEAFA;
+  --amber: #7A5A1A;
+  --amber-l: #FDF3DA;
+  --blue: #1A4A88;
+  --blue-l: #E5EFF8;
+  --teal: #1A6B72;
+  --teal-l: #E4F4F5;
+  --rose: #8B2252;
+  --rose-l: #FAEAF2;
+  --r: 10px; --rs: 6px;
+  --sh: 0 1px 4px rgba(0,0,0,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'PingFang SC','Noto Sans SC',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;min-height:100vh}
+
+/* ── Header ── */
+.hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.logo{display:flex;align-items:center;gap:11px}
+.logo-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),#1A8C5C);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;flex-shrink:0}
+.logo-text{font-weight:700;font-size:17px;color:var(--accent)}
+.logo-sub{font-size:11px;color:var(--text3);font-weight:400;margin-top:-2px}
+.hdr-badge{font-size:11px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px 11px}
+
+/* ── Layout ── */
+.layout{display:grid;grid-template-columns:300px 1fr;min-height:calc(100vh - 58px)}
+
+/* ── Sidebar ── */
+.sb{background:var(--surface);border-right:1px solid var(--border);padding:20px 18px;overflow-y:auto;display:flex;flex-direction:column;gap:22px}
+.slabel{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text3);margin-bottom:9px}
+
+/* Grade */
+.gg{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.gb{background:var(--surface2);border:1.5px solid transparent;border-radius:var(--rs);padding:7px 3px;text-align:center;cursor:pointer;transition:all .15s;font-size:12px;color:var(--text2)}
+.gb:hover{background:var(--accent-l);border-color:var(--accent-m)}
+.gb.on{background:var(--accent-l);border-color:var(--accent);color:var(--accent);font-weight:700}
+.gn{font-size:16px;font-weight:800;display:block;line-height:1.15}
+.gt{font-size:9.5px;color:var(--text3)}
+.gb.on .gt{color:var(--accent)}
+
+/* Subjects */
+.subs{display:flex;flex-direction:column;gap:5px}
+.subg{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;padding:6px 0 2px 2px;border-bottom:1px solid var(--border);margin-bottom:3px}
+.subrow{display:flex;align-items:center;justify-content:space-between;padding:7px 9px;background:var(--surface2);border-radius:var(--rs);cursor:pointer;transition:background .15s}
+.subrow:hover{background:#E4E1D9}
+.subname{font-size:12.5px;display:flex;align-items:center;gap:6px}
+.tog{width:32px;height:19px;background:var(--border);border-radius:10px;position:relative;transition:background .2s;flex-shrink:0}
+.tog::after{content:'';position:absolute;width:15px;height:15px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tog.on{background:var(--accent)}
+.tog.on::after{transform:translateX(13px)}
+
+/* API */
+.api-wrap{position:relative}
+.api-in{width:100%;padding:8px 34px 8px 10px;border:1px solid var(--border);border-radius:var(--rs);font-size:12px;background:var(--surface2);color:var(--text);outline:none;font-family:monospace}
+.api-in:focus{border-color:var(--accent);background:#fff}
+.eye{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px}
+.api-hint{font-size:10.5px;color:var(--text3);margin-top:5px}
+.api-hint a{color:var(--accent);text-decoration:none}
+
+/* Teacher persona card */
+.persona{background:linear-gradient(135deg,#1E5C3E,#2A5F70);border-radius:var(--r);padding:14px 16px;color:#fff}
+.persona-name{font-size:14px;font-weight:700;margin-bottom:4px}
+.persona-desc{font-size:11.5px;opacity:.85;line-height:1.55}
+
+/* ── Main ── */
+.main{padding:26px 30px;overflow-y:auto;display:flex;flex-direction:column;gap:22px}
+
+/* Input card */
+.ic{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--sh)}
+.ih{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.ititle{font-size:16px;font-weight:700}
+.gpill{font-size:11px;background:var(--accent-l);color:var(--accent);border-radius:20px;padding:3px 10px;font-weight:600}
+.pta{width:100%;min-height:84px;padding:11px 13px;border:1.5px solid var(--border);border-radius:var(--rs);font-size:15px;font-family:inherit;resize:vertical;outline:none;color:var(--text);background:var(--bg);transition:border-color .15s;line-height:1.6}
+.pta:focus{border-color:var(--accent);background:#fff}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.chip{font-size:11.5px;padding:4px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;cursor:pointer;color:var(--text2);transition:all .15s;white-space:nowrap}
+.chip:hover{background:var(--accent-l);border-color:var(--accent-m);color:var(--accent)}
+.sbrow{display:flex;align-items:center;justify-content:space-between;margin-top:13px}
+.chint{font-size:11.5px;color:var(--text3)}
+.sbtn{background:var(--accent);color:#fff;border:none;border-radius:var(--rs);padding:10px 22px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .15s;font-family:inherit}
+.sbtn:hover{background:#215038}
+.sbtn:disabled{background:var(--text3);cursor:not-allowed}
+.spn{width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+.sbtn.ld .spn{display:block}
+.sbtn.ld .bt{opacity:.7}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* States */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px;gap:12px;color:var(--text3);text-align:center}
+.empty-ico{font-size:44px}
+.empty-txt{font-size:14px;max-width:300px;line-height:1.65}
+.ldst{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:280px;gap:14px}
+.ldst.vis{display:flex}
+.bspin{width:38px;height:38px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+.ldtxt{font-size:14px;color:var(--text2)}
+.ldstep{font-size:12px;color:var(--text3)}
+.errc{background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--r);padding:14px 18px;color:#B91C1C;font-size:13.5px;display:none}
+.errc.vis{display:block}
+
+/* Result */
+.ra{display:flex;flex-direction:column;gap:16px}
+.rh{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.rt{font-size:20px;font-weight:800}
+.rmeta{font-size:13px;color:var(--text2);margin-top:3px;max-width:600px;line-height:1.5}
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--sh)}
+.card.full{grid-column:1/-1}
+.card.cl-g{border-left:3px solid var(--accent-m)}
+.card.cl-p{border-left:3px solid var(--purple)}
+.card.cl-b{border-left:3px solid #4A9EE0}
+.card.cl-a{border-left:3px solid #D4A017}
+.card.cl-w{border-left:3px solid var(--warn)}
+.card.cl-t{border-left:3px solid var(--teal)}
+.card.cl-r{border-left:3px solid var(--rose)}
+.ch{display:flex;align-items:center;gap:7px;margin-bottom:11px}
+.ci{font-size:15px}
+.ct{font-size:11.5px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em}
+
+/* Tags */
+.tl{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12.5px;padding:4px 10px;border-radius:20px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all .15s}
+.tag:hover{border-color:var(--accent-m);color:var(--accent);background:var(--accent-l)}
+.tag.tw{background:var(--warn-l);border-color:#F4A27A;color:var(--warn)}
+.tag.tw:hover{background:#FADDD0}
+
+/* Item list */
+.il{display:flex;flex-direction:column;gap:6px}
+.ir{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;padding:5px 0;border-bottom:1px solid var(--border);line-height:1.5}
+.ir:last-child{border-bottom:none}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent-m);margin-top:7px;flex-shrink:0}
+.dot.b{background:#4A9EE0}
+.dot.p{background:var(--purple)}
+
+/* ── KNOWLEDGE LESSON (main new section) ── */
+.lesson-area{display:flex;flex-direction:column;gap:0}
+.lesson-nav{display:flex;gap:0;overflow-x:auto;border-bottom:2px solid var(--border);margin-bottom:0}
+.lnav-btn{background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:10px 16px;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .2s}
+.lnav-btn:hover{color:var(--text)}
+.lnav-btn.on{color:var(--accent);border-bottom-color:var(--accent)}
+.lpage{display:none;padding-top:16px}
+.lpage.vis{display:block}
+
+/* Knowledge block */
+.kblock{background:var(--surface2);border-radius:var(--r);padding:16px 18px;margin-bottom:13px;border:1px solid var(--border)}
+.kblock-title{font-size:15px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.kblock-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--accent-l);color:var(--accent)}
+.kblock-body{font-size:13.5px;color:var(--text2);line-height:1.7}
+.kblock-body p{margin-bottom:8px}
+.kblock-body p:last-child{margin-bottom:0}
+.kblock-body strong{color:var(--text);font-weight:600}
+.analogy{background:var(--amber-l);border-left:3px solid #D4A017;border-radius:0 var(--rs) var(--rs) 0;padding:10px 13px;margin:10px 0;font-size:13px;color:var(--amber);line-height:1.55}
+.analogy::before{content:'💡 类比：';font-weight:700;margin-right:4px}
+
+/* Video embed */
+.vid-card{background:#000;border-radius:var(--r);overflow:hidden;margin:12px 0;position:relative;aspect-ratio:16/9}
+.vid-card iframe{width:100%;height:100%;border:none;display:block}
+.vid-placeholder{background:linear-gradient(135deg,#1a1a2e,#16213e);aspect-ratio:16/9;border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;margin:12px 0;transition:opacity .2s}
+.vid-placeholder:hover{opacity:.88}
+.vid-placeholder .play{font-size:40px}
+.vid-placeholder .vt{color:#fff;font-size:13px;font-weight:600}
+.vid-placeholder .vs{color:rgba(255,255,255,.6);font-size:11px}
+
+/* Resources */
+.res-list{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.res-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);text-decoration:none;color:var(--text);transition:all .15s}
+.res-item:hover{border-color:var(--accent-m);background:var(--accent-l)}
+.res-ico{font-size:18px;flex-shrink:0;margin-top:1px}
+.res-info{}
+.res-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+.res-desc{font-size:11.5px;color:var(--text3);line-height:1.4}
+.res-type{font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;margin-left:6px;vertical-align:middle}
+.rt-book{background:var(--amber-l);color:var(--amber)}
+.rt-video{background:#fee2e2;color:#b91c1c}
+.rt-web{background:var(--blue-l);color:var(--blue)}
+.rt-doc{background:var(--teal-l);color:var(--teal)}
+
+/* Quiz in lesson */
+.qz{background:var(--purple-l);border:1px solid #CECBF6;border-radius:var(--r);padding:14px 16px;margin:12px 0}
+.qz-q{font-size:14px;font-weight:600;color:var(--purple);margin-bottom:10px}
+.qz-opts{display:flex;flex-direction:column;gap:6px}
+.qz-opt{background:#fff;border:1.5px solid #CECBF6;border-radius:var(--rs);padding:8px 12px;font-size:13px;cursor:pointer;text-align:left;font-family:inherit;color:var(--text);transition:all .15s}
+.qz-opt:hover{border-color:var(--purple);background:var(--purple-l)}
+.qz-opt.correct{background:#d1fae5;border-color:#34d399;color:#065f46}
+.qz-opt.wrong{background:#fee2e2;border-color:#f87171;color:#991b1b}
+.qz-fb{font-size:12.5px;margin-top:8px;padding:8px 10px;border-radius:var(--rs);display:none}
+.qz-fb.vis{display:block}
+.qz-fb.ok{background:#d1fae5;color:#065f46}
+.qz-fb.no{background:#fee2e2;color:#991b1b}
+
+/* Courseware bar */
+.cwbar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 17px;display:none;align-items:center;justify-content:space-between;box-shadow:var(--sh)}
+.cwbar.vis{display:flex}
+.cwl{font-size:13.5px;font-weight:600}
+.cws{font-size:11.5px;color:var(--text3);margin-top:2px}
+.cpbtn{background:var(--purple-l);color:var(--purple);border:1px solid #CECBF6;border-radius:var(--rs);padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.cpbtn:hover{background:#DEDCFA}
+
+/* Lang table */
+.ltbl{width:100%;border-collapse:collapse;font-size:13px}
+.ltbl th{text-align:left;padding:6px 10px;background:var(--surface2);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border)}
+.ltbl td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+.ltbl tr:last-child td{border-bottom:none}
+.len{color:var(--blue)}
+.les{color:var(--rose)}
+
+/* Detail popover */
+.kp-detail{display:none;background:var(--purple-l);border:1px solid #CECBF6;border-radius:var(--rs);padding:12px 14px;margin-top:10px;font-size:13.5px;color:var(--purple);line-height:1.6}
+.kp-detail.vis{display:block}
+
+/* Quiz answers */
+.qa{font-size:13px;color:var(--text2);margin-top:7px;display:none;line-height:1.5;padding:8px;background:var(--surface2);border-radius:var(--rs)}
+.qa.show{display:block}
+.qa-btn{font-size:11.5px;background:none;border:1px solid var(--border);border-radius:4px;padding:3px 10px;cursor:pointer;color:var(--text2);font-family:inherit;transition:all .15s;margin-top:6px}
+.qa-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Expand detail */
+.exp-det{background:var(--warn-l);border:1px solid #F4A27A;border-radius:var(--rs);padding:12px 14px;margin-top:10px;font-size:13px;color:var(--text2);line-height:1.5;display:none}
+.exp-det.vis{display:block}
+.exp-det-name{font-weight:700;color:var(--warn);margin-bottom:4px}
+
+@media(max-width:768px){
+  .layout{grid-template-columns:1fr}
+  .sb{border-right:none;border-bottom:1px solid var(--border)}
+  .main{padding:16px}
+  .rg{grid-template-columns:1fr}
+  .card.full{grid-column:1}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="logo">
+    <div class="logo-mark">🌍</div>
+    <div>
+      <div class="logo-text">博学先生</div>
+      <div class="logo-sub">PBL 项目式学习助手</div>
+    </div>
+  </div>
+  <div class="hdr-badge">由 Claude AI 驱动</div>
+</header>
+
+<div class="layout">
+<aside class="sb">
+
+  <!-- Teacher persona -->
+  <div class="persona">
+    <div class="persona-name">👨‍🏫 你的导师：博学先生</div>
+    <div class="persona-desc">精通数学、自然科学、人文历史、音乐艺术与医学动物学，走遍世界 40 余国，用最生动的方式帮每个孩子找到知识的意义。</div>
+  </div>
+
+  <!-- Grade -->
+  <div>
+    <div class="slabel">孩子年级</div>
+    <div class="gg" id="gradeGrid">
+      <button class="gb" data-g="1" data-a="7" data-lv="小学低年级" onclick="selGrade(this)"><span class="gn">一</span><span class="gt">年级</span></button>
+      <button class="gb" data-g="2" data-a="8" data-lv="小学低年级" onclick="selGrade(this)"><span class="gn">二</span><span class="gt">年级</span></button>
+      <button class="gb on" data-g="3" data-a="9" data-lv="小学中年级" onclick="selGrade(this)"><span class="gn">三</span><span class="gt">年级</span></button>
+      <button class="gb" data-g="4" data-a="10" data-lv="小学中年级" onclick="selGrade(this)"><span class="gn">四</span><span class="gt">年级</span></button>
+      <button class="gb" data-g="5" data-a="11" data-lv="小学高年级" onclick="selGrade(this)"><span class="gn">五</span><span class="gt">年级</span></button>
+      <button class="gb" data-g="6" data-a="12" data-lv="小学高年级" onclick="selGrade(this)"><span class="gn">六</span><span class="gt">年级</span></button>
+      <button class="gb" data-g="7" data-a="13" data-lv="初中" onclick="selGrade(this)"><span class="gn">初一</span><span class="gt">七年级</span></button>
+      <button class="gb" data-g="8" data-a="14" data-lv="初中" onclick="selGrade(this)"><span class="gn">初二</span><span class="gt">八年级</span></button>
+      <button class="gb" data-g="9" data-a="15" data-lv="初中" onclick="selGrade(this)"><span class="gn">初三</span><span class="gt">九年级</span></button>
+      <button class="gb" data-g="10" data-a="16" data-lv="高中" onclick="selGrade(this)"><span class="gn">高一</span><span class="gt">十年级</span></button>
+      <button class="gb" data-g="11" data-a="17" data-lv="高中" onclick="selGrade(this)"><span class="gn">高二</span><span class="gt">十一年级</span></button>
+      <button class="gb" data-g="12" data-a="18" data-lv="高中" onclick="selGrade(this)"><span class="gn">高三</span><span class="gt">十二年级</span></button>
+    </div>
+  </div>
+
+  <!-- Subjects -->
+  <div>
+    <div class="slabel">启用学科</div>
+    <div class="subs">
+      <div class="subg">基础学科</div>
+      <label class="subrow" onclick="togSub('math')"><span class="subname">🔢 数学</span><div class="tog on" id="t-math"></div></label>
+      <label class="subrow" onclick="togSub('science')"><span class="subname">⚗️ 物理 / 化学 / 生物</span><div class="tog on" id="t-science"></div></label>
+      <label class="subrow" onclick="togSub('chinese')"><span class="subname">📖 语文 / 写作</span><div class="tog on" id="t-chinese"></div></label>
+      <label class="subrow" onclick="togSub('history')"><span class="subname">🏛️ 历史 / 地理</span><div class="tog on" id="t-history"></div></label>
+      <label class="subrow" onclick="togSub('computer')"><span class="subname">💻 信息技术 / 编程</span><div class="tog on" id="t-computer"></div></label>
+      <div class="subg">语言</div>
+      <label class="subrow" onclick="togSub('english')"><span class="subname">🇬🇧 英语</span><div class="tog on" id="t-english"></div></label>
+      <label class="subrow" onclick="togSub('spanish')"><span class="subname">🇪🇸 西班牙语</span><div class="tog" id="t-spanish"></div></label>
+      <label class="subrow" onclick="togSub('japanese')"><span class="subname">🇯🇵 日语</span><div class="tog" id="t-japanese"></div></label>
+      <div class="subg">艺术 &amp; 人文</div>
+      <label class="subrow" onclick="togSub('music')"><span class="subname">🎵 音乐 / 乐理</span><div class="tog on" id="t-music"></div></label>
+      <label class="subrow" onclick="togSub('art')"><span class="subname">🎨 美术 / 设计</span><div class="tog on" id="t-art"></div></label>
+      <label class="subrow" onclick="togSub('politics')"><span class="subname">🏛 政治 / 公民</span><div class="tog" id="t-politics"></div></label>
+      <div class="subg">自然 &amp; 生命</div>
+      <label class="subrow" onclick="togSub('animals')"><span class="subname">🦁 动物学 / 生态</span><div class="tog on" id="t-animals"></div></label>
+      <label class="subrow" onclick="togSub('medicine')"><span class="subname">🩺 医学 / 人体</span><div class="tog" id="t-medicine"></div></label>
+      <label class="subrow" onclick="togSub('environment')"><span class="subname">🌱 环境 / 可持续</span><div class="tog on" id="t-environment"></div></label>
+      <div class="subg">社会 &amp; 经济</div>
+      <label class="subrow" onclick="togSub('economics')"><span class="subname">💰 经济 / 商业</span><div class="tog" id="t-economics"></div></label>
+      <label class="subrow" onclick="togSub('philosophy')"><span class="subname">🤔 哲学 / 逻辑</span><div class="tog" id="t-philosophy"></div></label>
+    </div>
+  </div>
+
+  <!-- API key -->
+  <div>
+    <div class="slabel">Claude API Key</div>
+    <div class="api-wrap">
+      <input type="password" class="api-in" id="apiKey" placeholder="sk-ant-…"/>
+      <button class="eye" onclick="togEye()">👁</button>
+    </div>
+    <p class="api-hint">获取：<a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>（免费额度可用）<br>Key 仅存于本地，不会上传。</p>
+  </div>
+
+</aside>
+
+<main class="main">
+
+  <!-- Input -->
+  <div class="ic">
+    <div class="ih">
+      <div class="ititle">输入学习问题</div>
+      <div class="gpill" id="gradePill">三年级 · 约9岁</div>
+    </div>
+    <textarea class="pta" id="pi" placeholder="描述孩子想研究或想做的事，越具体越好…&#10;&#10;例：教三年级的孩子 3D 打印"></textarea>
+    <div class="chips">
+      <span class="chip" onclick="fill(this)">教三年级的孩子 3D 打印</span>
+      <span class="chip" onclick="fill(this)">测学校酸辣粉汤含食盐的浓度</span>
+      <span class="chip" onclick="fill(this)">用废旧材料建小型风力发电机</span>
+      <span class="chip" onclick="fill(this)">研究附近河流的水质变化</span>
+      <span class="chip" onclick="fill(this)">认识和学习钢琴的基础乐理</span>
+      <span class="chip" onclick="fill(this)">了解人体消化系统是如何工作的</span>
+      <span class="chip" onclick="fill(this)">探索濒危动物保护的方法</span>
+    </div>
+    <div class="sbrow">
+      <span class="chint" id="chint">请先填写问题</span>
+      <button class="sbtn" id="sbtn" onclick="run()" disabled>
+        <div class="spn"></div>
+        <span class="bt">拆解并开始学习 →</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="errc" id="errc"></div>
+
+  <div class="ldst" id="ldst">
+    <div class="bspin"></div>
+    <div class="ldtxt">博学先生正在备课…</div>
+    <div class="ldstep" id="ldstep">连接知识库</div>
+  </div>
+
+  <div class="empty" id="empty">
+    <div class="empty-ico">🌍</div>
+    <div class="empty-txt">选择年级、开启感兴趣的学科，告诉博学先生你想探索什么——他会把整条学习路径拆给你，并直接在这里上课！</div>
+  </div>
+
+  <div class="ra" id="ra" style="display:none">
+
+    <div class="rh">
+      <div>
+        <div class="rt" id="rtitle"></div>
+        <div class="rmeta" id="rmeta"></div>
+      </div>
+    </div>
+
+    <div class="cwbar" id="cwbar">
+      <div>
+        <div class="cwl">📋 生成课件提示词</div>
+        <div class="cws">复制后粘贴至 WorkBuddy / ChatGPT，可直接生成 HTML 互动课件</div>
+      </div>
+      <button class="cpbtn" onclick="copyPrompt()">复制课件 Prompt</button>
+    </div>
+
+    <div class="rg" id="rg"></div>
+
+    <!-- Lesson area -->
+    <div class="card full cl-t" id="lessonCard" style="display:none">
+      <div class="ch"><span class="ci">🎓</span><span class="ct">在这里学习 · 博学先生讲解</span></div>
+      <div class="lesson-area">
+        <div class="lesson-nav" id="lessonNav"></div>
+        <div id="lessonPages"></div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+</div>
+
+<script>
+var S = {
+  grade:3, age:9, level:'小学中年级',
+  subs:{math:true,science:true,chinese:true,history:true,computer:true,
+        english:true,spanish:false,japanese:false,
+        music:true,art:true,politics:false,
+        animals:true,medicine:false,environment:true,
+        economics:false,philosophy:false},
+  res:null, prob:'', gradeStr:''
+};
+var SNAMES={math:'数学',science:'物理/化学/生物',chinese:'语文/写作',history:'历史/地理',
+            computer:'信息技术/编程',english:'英语',spanish:'西班牙语',japanese:'日语',
+            music:'音乐/乐理',art:'美术/设计',politics:'政治/公民',
+            animals:'动物学/生态',medicine:'医学/人体',environment:'环境/可持续',
+            economics:'经济/商业',philosophy:'哲学/逻辑'};
+
+function selGrade(b){
+  document.querySelectorAll('.gb').forEach(function(x){x.classList.remove('on')});
+  b.classList.add('on');
+  S.grade=+b.dataset.g; S.age=+b.dataset.a; S.level=b.dataset.lv;
+  document.getElementById('gradePill').textContent=b.querySelector('.gn').textContent+'年级 · 约'+S.age+'岁';
+}
+function togSub(k){
+  S.subs[k]=!S.subs[k];
+  document.getElementById('t-'+k).classList.toggle('on',S.subs[k]);
+}
+function togEye(){var i=document.getElementById('apiKey');i.type=i.type==='password'?'text':'password';}
+function fill(c){document.getElementById('pi').value=c.textContent;updBtn();}
+function getSubList(){return Object.entries(S.subs).filter(function(e){return e[1];}).map(function(e){return SNAMES[e[0]];}).join('、');}
+
+document.getElementById('pi').addEventListener('input',updBtn);
+document.getElementById('apiKey').addEventListener('input',updBtn);
+function updBtn(){
+  var v=document.getElementById('pi').value.trim(),k=document.getElementById('apiKey').value.trim();
+  var b=document.getElementById('sbtn'),h=document.getElementById('chint');
+  if(!v){h.textContent='请先填写问题';b.disabled=true;return;}
+  if(!k){h.textContent='请填写 API Key';b.disabled=true;return;}
+  h.textContent=v.length+' 字';b.disabled=false;
+}
+
+async function run(){
+  var prob=document.getElementById('pi').value.trim();
+  var key=document.getElementById('apiKey').value.trim();
+  if(!prob||!key) return;
+  var btn=document.getElementById('sbtn');
+  btn.classList.add('ld');btn.disabled=true;
+  document.getElementById('empty').style.display='none';
+  document.getElementById('ra').style.display='none';
+  document.getElementById('errc').classList.remove('vis');
+  var ld=document.getElementById('ldst');ld.classList.add('vis');
+  var steps=['连接知识库…','分析学习目标…','匹配年龄框架…','拆解知识点…','博学先生备课中…','整理参考资料…'];
+  var si=0;
+  var iv=setInterval(function(){si=(si+1)%steps.length;document.getElementById('ldstep').textContent=steps[si];},1100);
+
+  var hasMiddle=S.grade>=7;
+  var hasHigh=S.grade>=10;
+  var langOn=S.subs.english||S.subs.spanish||S.subs.japanese;
+
+  var langFields='';
+  if(langOn){
+    langFields='\n9. language_terms: 主题相关词汇（5-8条），每条含：zh（中文）'+(S.subs.english?'、en（英语）':'')+(S.subs.spanish?'、es（西班牙语）':'')+(S.subs.japanese?'、ja（日语）':'')+'、example（一句例句）';
+  }
+  var examFields='';
+  if(hasMiddle){
+    examFields='\n7. exam_points: 相关考点（每条含 point、subject）\n8. sample_questions: 3道练习题（每题含 q、a、type）';
+  }
+
+  var prompt=`你是"博学先生"——一位精通全球各学科、走遍世界的资深教育家，擅长用最生动的方式为孩子讲解任何领域的知识。你的风格：亲切、具体、充满类比和例子，从不说教。
+
+孩子信息：
+- 年级：${S.level}（${S.grade}年级，约${S.age}岁）
+- 探索问题：${prob}
+- 启用学科：${getSubList()}
+
+请输出一个 JSON 对象（纯 JSON，不要任何 markdown 标记），包含以下字段：
+
+1. project_title: 项目名称（10字内）
+2. brief: 一句话介绍（35字内，面向孩子，活泼有趣）
+3. inputs: 前置知识列表（3-5条，每条15字内）
+4. outputs: 完成后成果（3-5条，每条15字内）
+5. knowledge_points: 核心知识点数组，每条含：
+   - name（名称）、subject（学科）
+   - desc（适合${S.age}岁理解的通俗解释，30字内）
+   - is_curriculum（是否课内）
+6. expand_points: 拓展探索点（超纲但可探索），每条含：name、why_interesting（20字内）、age_suitable${examFields}${langFields}
+10. lessons: 知识讲解模块数组（这是核心！），每个模块是一堂"迷你课"，对应一个核心知识点，包含：
+   - title: 课题名称
+   - subject: 所属学科
+   - intro: 开场白（博学先生风格，2-3句话，像老朋友讲故事一样引入，适合${S.age}岁）
+   - sections: 讲解段落数组，每段含：
+     * heading: 小标题
+     * body: 内容（3-5句，通俗、具体，可用类比，适合${S.age}岁，不要说教）
+     * analogy: 生动类比（1句，可选，留空则为null）
+   - mini_quiz: 一道小测验，含：q（题目）、options（4个选项数组）、correct（正确选项index 0-3）、explanation（解释，2句）
+   - resources: 参考资料数组（3-5条），每条含：
+     * type: "book"/"video"/"website"/"documentary"
+     * title: 名称
+     * desc: 一句简介（15字内）
+     * url: 链接（YouTube搜索链接用 https://www.youtube.com/results?search_query=关键词 格式，书籍用豆瓣链接，网站用真实URL）
+     * safe: true（必须确保对${S.age}岁孩子完全安全，无游戏/广告/成人内容）
+
+严格要求：
+- lessons 数量：3-5个，覆盖最重要的知识点
+- 所有内容适合${S.age}岁（${S.level}），language 要口语化
+- resources 必须真实存在、对孩子安全，不推荐含广告、游戏、成瘾性内容的平台
+- 直接输出 JSON，无任何前缀说明`;
+
+  try{
+    var r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:6000,messages:[{role:'user',content:prompt}]})
+    });
+    clearInterval(iv);
+    if(!r.ok){var e=await r.json().catch(function(){return{};});throw new Error((e.error&&e.error.message)||'API错误 '+r.status);}
+    var d=await r.json();
+    var raw=d.content[0].text.trim().replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'');
+    var res=JSON.parse(raw);
+    S.res=res; S.prob=prob; S.gradeStr=S.level+'（'+S.grade+'年级，约'+S.age+'岁）';
+    ld.classList.remove('vis');
+    render(res);
+  }catch(e){
+    clearInterval(iv);ld.classList.remove('vis');
+    var ec=document.getElementById('errc');
+    ec.textContent='出错了：'+e.message+'。请检查 API Key 和网络连接。';ec.classList.add('vis');
+    document.getElementById('empty').style.display='flex';
+  }
+  btn.classList.remove('ld');btn.disabled=false;
+}
+
+function render(r){
+  document.getElementById('rtitle').textContent=r.project_title||'学习路径';
+  document.getElementById('rmeta').textContent=r.brief||'';
+  document.getElementById('ra').style.display='flex';
+  document.getElementById('cwbar').classList.add('vis');
+  var g=document.getElementById('rg');g.innerHTML='';
+
+  // Inputs & Outputs
+  g.appendChild(mkListCard('📥','前置知识',r.inputs||[],'cl-b','b'));
+  g.appendChild(mkListCard('📤','学习成果',r.outputs||[],'cl-g',''));
+
+  // Knowledge points
+  var kc=mkCard('full cl-p');
+  kc.innerHTML='<div class="ch"><span class="ci">🧩</span><span class="ct">核心知识点（点击查看说明）</span></div><div class="tl" id="kptl"></div><div class="kp-detail" id="kpdet"></div>';
+  g.appendChild(kc);
+  var kptl=kc.querySelector('#kptl');
+  (r.knowledge_points||[]).forEach(function(kp){
+    var t=document.createElement('div');t.className='tag';
+    t.innerHTML=(kp.is_curriculum?'📌':'💡')+' <strong>'+kp.subject+'</strong> · '+kp.name;
+    t.onclick=function(){var d=kc.querySelector('#kpdet');d.classList.add('vis');d.innerHTML='<strong>'+kp.name+'</strong>（'+kp.subject+(kp.is_curriculum?' · 课内':' · 拓展')+'）<br>'+kp.desc;};
+    kptl.appendChild(t);
+  });
+
+  // Expand points
+  if((r.expand_points||[]).length){
+    var ec=mkCard('full cl-w');
+    ec.innerHTML='<div class="ch"><span class="ci">⚡</span><span class="ct">拓展探索点（点击了解）</span></div><div class="tl" id="eptl"></div><div class="exp-det" id="epdet"></div>';
+    g.appendChild(ec);
+    var eptl=ec.querySelector('#eptl');
+    r.expand_points.forEach(function(ep){
+      var t=document.createElement('div');t.className='tag tw';t.textContent='⚠️ '+ep.name;
+      t.onclick=function(){var d=ec.querySelector('#epdet');d.classList.add('vis');d.innerHTML='<div class="exp-det-name">⚡ '+ep.name+'</div><div>为什么值得探索：'+ep.why_interesting+'</div><div style="margin-top:4px;color:var(--text3)">建议年龄：'+ep.age_suitable+'</div>';};
+      eptl.appendChild(t);
+    });
+  }
+
+  // Exam points
+  if((r.exam_points||[]).length){
+    var exc=mkCard('full cl-a');
+    exc.innerHTML='<div class="ch"><span class="ci">📝</span><span class="ct">相关考点</span></div><div class="tl">'+
+      r.exam_points.map(function(e){return '<div class="tag" style="background:var(--amber-l);border-color:#E8C97A;color:var(--amber)">📌 '+e.subject+' · '+e.point+'</div>';}).join('')+'</div>';
+    g.appendChild(exc);
+  }
+
+  // Sample questions
+  if((r.sample_questions||[]).length){
+    var sqc=mkCard('full');sqc.style.borderLeft='3px solid #D4A017';
+    sqc.innerHTML='<div class="ch"><span class="ci">❓</span><span class="ct">类似题目练习</span></div><div id="sql"></div>';
+    g.appendChild(sqc);
+    var sql=sqc.querySelector('#sql');
+    r.sample_questions.forEach(function(q,i){
+      var d=document.createElement('div');d.className='kblock';
+      d.innerHTML='<div class="kblock-title">'+q.type+' '+(i+1)+'</div><div class="kblock-body">'+q.q+'</div>'+
+        '<button class="qa-btn" onclick="togQA(this)">查看参考答案</button><div class="qa">'+q.a+'</div>';
+      sql.appendChild(d);
+    });
+  }
+
+  // Language terms
+  if((r.language_terms||[]).length){
+    var lc=mkCard('full');lc.style.borderLeft='3px solid #4A9EE0';
+    lc.innerHTML='<div class="ch"><span class="ci">🌍</span><span class="ct">语言延伸</span></div>'+
+      '<table class="ltbl"><thead><tr><th>中文</th>'+(S.subs.english?'<th>英语</th>':'')+(S.subs.spanish?'<th>西班牙语</th>':'')+(S.subs.japanese?'<th>日语</th>':'')+'<th>例句</th></tr></thead><tbody>'+
+      r.language_terms.map(function(lt){return '<tr><td style="font-weight:600">'+lt.zh+'</td>'+(S.subs.english?'<td class="len">'+(lt.en||'—')+'</td>':'')+(S.subs.spanish?'<td class="les">'+(lt.es||'—')+'</td>':'')+(S.subs.japanese?'<td style="color:var(--rose)">'+(lt.ja||'—')+'</td>':'')+'<td style="color:var(--text3);font-size:12px">'+(lt.example||'')+'</td></tr>';}).join('')+
+      '</tbody></table>';
+    g.appendChild(lc);
+  }
+
+  // Lessons
+  if((r.lessons||[]).length){
+    renderLessons(r.lessons);
+  }
+}
+
+function renderLessons(lessons){
+  var lc=document.getElementById('lessonCard');
+  lc.style.display='block';
+  var nav=document.getElementById('lessonNav');
+  var pages=document.getElementById('lessonPages');
+  nav.innerHTML='';pages.innerHTML='';
+
+  lessons.forEach(function(ls,i){
+    // Nav tab
+    var tb=document.createElement('button');
+    tb.className='lnav-btn'+(i===0?' on':'');
+    tb.textContent=ls.subject+' · '+ls.title;
+    tb.onclick=(function(idx){return function(){
+      document.querySelectorAll('.lnav-btn').forEach(function(x){x.classList.remove('on')});
+      document.querySelectorAll('.lpage').forEach(function(x){x.classList.remove('vis')});
+      this.classList.add('on');
+      document.getElementById('lpage-'+idx).classList.add('vis');
+    };})(i);
+    nav.appendChild(tb);
+
+    // Page
+    var pg=document.createElement('div');
+    pg.className='lpage'+(i===0?' vis':'');
+    pg.id='lpage-'+i;
+
+    var html='';
+
+    // Intro
+    html+='<div class="kblock" style="background:linear-gradient(135deg,#f0f9f4,#e8f5ee);border-color:var(--accent-m)">';
+    html+='<div class="kblock-title"><span>👨‍🏫</span> 博学先生说 <span class="kblock-badge">'+ls.subject+'</span></div>';
+    html+='<div class="kblock-body"><p>'+escHtml(ls.intro)+'</p></div></div>';
+
+    // Sections
+    (ls.sections||[]).forEach(function(sec){
+      html+='<div class="kblock">';
+      html+='<div class="kblock-title">'+escHtml(sec.heading)+'</div>';
+      html+='<div class="kblock-body"><p>'+escHtml(sec.body)+'</p>';
+      if(sec.analogy){html+='<div class="analogy">'+escHtml(sec.analogy)+'</div>';}
+      html+='</div></div>';
+    });
+
+    // Mini quiz
+    if(ls.mini_quiz){
+      var q=ls.mini_quiz;
+      html+='<div class="qz"><div class="qz-q">🎯 小测验：'+escHtml(q.q)+'</div><div class="qz-opts" id="qzo-'+i+'">';
+      (q.options||[]).forEach(function(opt,oi){
+        html+='<button class="qz-opt" onclick="answerQuiz(this,'+i+','+oi+','+q.correct+',\''+escJs(q.explanation)+'\')">'+String.fromCharCode(65+oi)+'. '+escHtml(opt)+'</button>';
+      });
+      html+='</div><div class="qz-fb" id="qzfb-'+i+'"></div></div>';
+    }
+
+    // Resources
+    if((ls.resources||[]).length){
+      html+='<div class="ch" style="margin-top:16px;margin-bottom:8px"><span class="ci">📚</span><span class="ct">参考资料 &amp; 延伸阅读</span></div>';
+      html+='<div class="res-list">';
+      ls.resources.forEach(function(res){
+        var ico=res.type==='book'?'📗':res.type==='video'?'🎬':res.type==='documentary'?'🎥':'🔗';
+        var badge=res.type==='book'?'书籍':res.type==='video'?'视频':res.type==='documentary'?'纪录片':'网站';
+        var badgeCls='rt-'+( res.type==='book'?'book':res.type==='video'||res.type==='documentary'?'video':'web');
+        html+='<a class="res-item" href="'+escHtml(res.url||'#')+'" target="_blank" rel="noopener noreferrer">';
+        html+='<span class="res-ico">'+ico+'</span>';
+        html+='<div class="res-info"><div class="res-title">'+escHtml(res.title)+'<span class="res-type '+badgeCls+'">'+badge+'</span></div>';
+        html+='<div class="res-desc">'+escHtml(res.desc)+'</div></div></a>';
+      });
+      html+='</div>';
+    }
+
+    pg.innerHTML=html;
+    pages.appendChild(pg);
+  });
+}
+
+function answerQuiz(btn,lessonIdx,optIdx,correct,explanation){
+  var opts=document.querySelectorAll('#qzo-'+lessonIdx+' .qz-opt');
+  opts.forEach(function(o){o.disabled=true;o.style.cursor='default';});
+  var fb=document.getElementById('qzfb-'+lessonIdx);
+  if(optIdx===correct){
+    btn.classList.add('correct');
+    fb.className='qz-fb vis ok';
+    fb.textContent='✅ 答对了！'+explanation;
+  }else{
+    btn.classList.add('wrong');
+    opts[correct].classList.add('correct');
+    fb.className='qz-fb vis no';
+    fb.textContent='❌ 再想想。'+explanation;
+  }
+}
+
+function togQA(btn){
+  var a=btn.nextElementSibling;
+  a.classList.toggle('show');
+  btn.textContent=a.classList.contains('show')?'收起答案':'查看参考答案';
+}
+
+function mkCard(cls){
+  var d=document.createElement('div');d.className='card '+(cls||'');return d;
+}
+function mkListCard(icon,title,items,acc,dotCls){
+  var d=mkCard(acc);
+  d.innerHTML='<div class="ch"><span class="ci">'+icon+'</span><span class="ct">'+title+'</span></div><div class="il">'+
+    items.map(function(it){return '<div class="ir"><div class="dot '+dotCls+'"></div><div>'+escHtml(it)+'</div></div>';}).join('')+'</div>';
+  return d;
+}
+
+function escHtml(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escJs(s){
+  return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');
+}
+
+function copyPrompt(){
+  if(!S.res) return;
+  var r=S.res;
+  var kps=(r.knowledge_points||[]).map(function(k){return '- '+k.subject+'：'+k.name+' — '+k.desc;}).join('\n');
+  var exps=(r.expand_points||[]).map(function(e){return '- '+e.name+'（'+e.age_suitable+'）';}).join('\n');
+  var txt='请为以下 PBL 项目生成一份互动式 HTML 课件：\n\n项目名称：'+r.project_title+'\n项目简介：'+r.brief+'\n目标年级：'+S.gradeStr+'\n学习问题：'+S.prob+'\n\n核心知识点：\n'+kps+'\n\n拓展点（点到为止）：\n'+exps+'\n\n课件要求：\n1. 语言活泼、适合目标年级\n2. 每个知识点配互动（小测验/动画/示例）\n3. 有"我学到了什么"总结页\n4. 响应式，适合平板\n\n请输出完整可运行的单页 HTML 文件。';
+  navigator.clipboard.writeText(txt).then(function(){
+    var b=document.querySelector('.cpbtn');b.textContent='✓ 已复制！';
+    setTimeout(function(){b.textContent='复制课件 Prompt';},2200);
+  });
+}
+
+// persist api key
+document.getElementById('apiKey').addEventListener('change',function(e){if(e.target.value)localStorage.setItem('pbl_key',e.target.value);});
+window.addEventListener('load',function(){
+  var k=localStorage.getItem('pbl_key');
+  if(k) document.getElementById('apiKey').value=k;
+  updBtn();
+});
+</script>
+</body>
+</html>
