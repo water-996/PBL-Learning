@@ -259,7 +259,7 @@ body{font-family:-apple-system,'PingFang SC','Noto Sans SC',sans-serif;backgroun
       <div class="logo-sub">PBL 项目式学习助手</div>
     </div>
   </div>
-  <div class="hdr-badge">由 Gemini AI 驱动</div>
+  <div class="hdr-badge">由 DeepSeek AI 驱动</div>
 </header>
 
 <div class="layout">
@@ -320,12 +320,12 @@ body{font-family:-apple-system,'PingFang SC','Noto Sans SC',sans-serif;backgroun
 
   <!-- API key -->
   <div>
-    <div class="slabel">Gemini API Key</div>
+    <div class="slabel">DeepSeek API Key</div>
     <div class="api-wrap">
-      <input type="password" class="api-in" id="apiKey" placeholder="AIza…"/>
+      <input type="password" class="api-in" id="apiKey" placeholder="sk-…"/>
       <button class="eye" onclick="togEye()">👁</button>
     </div>
-    <p class="api-hint">获取：<a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a>（完全免费，每天几百次）<br>Key 仅存于本地，不会上传。</p>
+    <p class="api-hint">获取：<a href="https://platform.deepseek.com" target="_blank">platform.deepseek.com</a>（注册送免费额度）<br>Key 仅存于本地，不会上传。</p>
   </div>
 
 </aside>
@@ -504,22 +504,26 @@ async function run(){
      * url: 链接（YouTube搜索链接用 https://www.youtube.com/results?search_query=关键词 格式，书籍用豆瓣链接，网站用真实URL）
      * safe: true（必须确保对${S.age}岁孩子完全安全，无游戏/广告/成人内容）
 
-严格要求：
-- lessons 数量：3-5个，覆盖最重要的知识点
-- 所有内容适合${S.age}岁（${S.level}），language 要口语化
+严格要求（年龄适配是最高优先级，违反此规则视为完全失败）：
+-【年龄红线】knowledge_points 的所有内容必须是${S.age}岁（${S.level}）在课堂上能理解的，绝对不允许出现超过年级2个级别以上的概念
+- 【小学1-6年级】只讲生活现象和直觉概念，不出现化学方程式、离子、摩尔等术语
+- 【初中7-9年级】可以有简单方程式和基础化学概念，不出现大学内容（如溶度积Ksp、莫尔法、滴定分析、电位法等）
+- 【高中10-12年级】可以有高中范围内的拓展，不出现大学专业课内容
+- 【expand_points】只写名称和一句话说明，绝对不展开讲，标注建议年龄
+- lessons 数量：3-5个，覆盖最重要的知识点，每堂课语言口语化
 - resources 必须真实存在、对孩子安全，不推荐含广告、游戏、成瘾性内容的平台
 - 直接输出 JSON，无任何前缀说明`;
 
   try{
-    var r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+key,{
+    var r=await fetch('https://api.deepseek.com/v1/chat/completions',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:6000,temperature:0.7}})
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model:'deepseek-chat',max_tokens:6000,temperature:0.7,messages:[{role:'user',content:prompt}]})
     });
     clearInterval(iv);
     if(!r.ok){var e=await r.json().catch(function(){return{};});throw new Error((e.error&&e.error.message)||'API错误 '+r.status);}
     var d=await r.json();
-    var raw=d.candidates[0].content.parts[0].text.trim().replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'');
+    var raw=d.choices[0].message.content.trim().replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'');
     var res=JSON.parse(raw);
     S.res=res; S.prob=prob; S.gradeStr=S.level+'（'+S.grade+'年级，约'+S.age+'岁）';
     ld.classList.remove('vis');
